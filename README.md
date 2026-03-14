@@ -1,8 +1,5 @@
-# Federated Machine Learning for Predicting Animal-to-Human Zoonotic Disease Outbreaks
-
-## Overview
-
-This project implements a federated machine learning system to predict animal-to-human zoonotic disease outbreaks. The frontend is built using Flask, providing a web interface for data visualization, model training, and prediction.
+# Federated-Machine-Learning-for-Predicting-Animal-to-Human-Zoonotic-Disease-Outbreaks
+This project implements a hybrid federated deep neural network (FDNN) combined with XGBoost to predict zoonotic disease outbreaks across distributed datasets (Farm, Hospital, Wildlife) without sharing raw data. Includes EDA, preprocessing, model training, and a Flask-based web dashboard for visualization and predictions.
 
 ## Features
 
@@ -25,8 +22,8 @@ This project implements a federated machine learning system to predict animal-to
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/your-username/your-repo-name.git
-   cd your-repo-name
+   git clone https://github.com/dayavallepu/Federated-Machine-Learning-for-Predicting-Animal-to-Human-Zoonotic-Disease-Outbreaks.git
+   cd Federated-Machine-Learning-for-Predicting-Animal-to-Human-Zoonotic-Disease-Outbreaks
    ```
 
 2. **Set up the Python environment**:
@@ -182,4 +179,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Contact
 
-For questions or support, please open an issue on GitHub or contact the maintainers.    
+For questions or support, please open an issue on GitHub or contact the maintainers.
