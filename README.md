@@ -22,8 +22,8 @@ This project implements a hybrid federated deep neural network (FDNN) combined w
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/your-username/your-repo-name](https://github.com/dayavallepu/Federated-Machine-Learning-for-Predicting-Animal-to-Human-Zoonotic-Disease-Outbreaks.git
-   cd your-repo-name
+   git clone https://github.com/dayavallepu/Federated-Machine-Learning-for-Predicting-Animal-to-Human-Zoonotic-Disease-Outbreaks.git
+   cd Federated-Machine-Learning-for-Predicting-Animal-to-Human-Zoonotic-Disease-Outbreaks
    ```
 
 2. **Set up the Python environment**:
