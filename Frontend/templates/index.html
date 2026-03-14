@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container py-5">
+        <div class="row align-items-center min-vh-80">
+            <div class="col-lg-6" data-aos="fade-right">
+                <h1 class="display-3 fw-bold mb-4">
+                    AI-Powered <span class="gradient-text">Zoonotic Disease</span> Prediction
+                </h1>
+                <p class="lead mb-4 text-light">
+                    Advanced federated learning system for predicting zoonotic disease risks across multiple sectors.
+                    Protect public health with our cutting-edge AI technology.
+                </p>
+                <div class="d-flex gap-3">
+                    {% if 'user_id' not in session %}
+                    <a href="{{ url_for('register') }}" class="btn gradient-btn pulse-animation">
+                        <i class="fas fa-rocket me-2"></i>Get Started
+                    </a>
+                    <a href="{{ url_for('login') }}" class="btn btn-outline-light">
+                        <i class="fas fa-sign-in-alt me-2"></i>Login
+                    </a>
+                    {% else %}
+                    <a href="{{ url_for('dashboard') }}" class="btn gradient-btn pulse-animation">
+                        <i class="fas fa-dashboard me-2"></i>Go to Dashboard
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-lg-6" data-aos="fade-left">
+                <div class="text-center floating-animation">
+                    <img src="https://cdn-icons-png.flaticon.com/512/4712/4712109.png" alt="AI Health" class="img-fluid"
+                        style="max-width: 400px;">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h2 class="display-5 fw-bold mb-3">Key Features</h2>
+            <p class="text-light">Comprehensive disease prediction across multiple domains</p>
+        </div>
+
+        <div class="row g-4">
+            <!-- Feature 1 -->
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+                <div class="glass-card p-4 h-100 text-center dashboard-card">
+                    <div class="card-icon mx-auto gradient-btn">
+                        <i class="fas fa-tractor fa-2x"></i>
+                    </div>
+                    <h4 class="fw-bold mb-3">Farm Monitoring</h4>
+                    <p class="text-light">Predict disease risks in livestock with environmental and health data
+                        analysis.</p>
+                </div>
+            </div>
+
+            <!-- Feature 2 -->
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+                <div class="glass-card p-4 h-100 text-center dashboard-card">
+                    <div class="card-icon mx-auto" style="background: var(--success-gradient);">
+                        <i class="fas fa-hospital fa-2x"></i>
+                    </div>
+                    <h4 class="fw-bold mb-3">Hospital Analytics</h4>
+                    <p class="text-light">Track and predict disease outbreaks using hospital admission and symptom data.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Feature 3 -->
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
+                <div class="glass-card p-4 h-100 text-center dashboard-card">
+                    <div class="card-icon mx-auto" style="background: var(--warning-gradient);">
+                        <i class="fas fa-paw fa-2x"></i>
+                    </div>
+                    <h4 class="fw-bold mb-3">Wildlife Tracking</h4>
+                    <p class="text-light">Monitor wildlife health and predict potential zoonotic transmission risks.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works -->
+<section class="py-5 bg-darker">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h2 class="display-5 fw-bold mb-3">How It Works</h2>
+            <p class="text-light">Three simple steps to get predictions</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-4" data-aos="fade-right">
+                <div class="d-flex align-items-start mb-4">
+                    <div class="rounded-circle gradient-btn me-3"
+                        style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                        <span class="fs-4 fw-bold">1</span>
+                    </div>
+                    <div>
+                        <h4 class="fw-bold">Upload Data</h4>
+                        <p class="text-light">Provide data from farm, hospital, or wildlife monitoring systems.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4" data-aos="fade-up">
+                <div class="d-flex align-items-start mb-4">
+                    <div class="rounded-circle gradient-btn me-3"
+                        style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                        <span class="fs-4 fw-bold">2</span>
+                    </div>
+                    <div>
+                        <h4 class="fw-bold">AI Analysis</h4>
+                        <p class="text-light">Our federated learning models analyze data while preserving privacy.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4" data-aos="fade-left">
+                <div class="d-flex align-items-start mb-4">
+                    <div class="rounded-circle gradient-btn me-3"
+                        style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                        <span class="fs-4 fw-bold">3</span>
+                    </div>
+                    <div>
+                        <h4 class="fw-bold">Get Results</h4>
+                        <p class="text-light">Receive detailed risk predictions with explainable AI insights.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Statistics -->
+<section class="py-5">
+    <div class="container">
+        <div class="row text-center g-4">
+            <div class="col-md-3" data-aos="zoom-in">
+                <div class="glass-card p-4">
+                    <h2 class="gradient-text fw-bold display-4">95% + </h2>
+                    <p class="text-light">Prediction Accuracy</p>
+                </div>
+            </div>
+            <div class="col-md-3" data-aos="zoom-in" data-aos-delay="100">
+                <div class="glass-card p-4">
+                    <h2 class="gradient-text fw-bold display-4">24/7</h2>
+                    <p class="text-light">Real-time Monitoring</p>
+                </div>
+            </div>
+            <div class="col-md-3" data-aos="zoom-in" data-aos-delay="200">
+                <div class="glass-card p-4">
+                    <h2 class="gradient-text fw-bold display-4">3</h2>
+                    <p class="text-light">Client Types</p>
+                </div>
+            </div>
+            <div class="col-md-3" data-aos="zoom-in" data-aos-delay="300">
+                <div class="glass-card p-4">
+                    <h2 class="gradient-text fw-bold display-4">18+</h2>
+                    <p class="text-light">Features Analyzed</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

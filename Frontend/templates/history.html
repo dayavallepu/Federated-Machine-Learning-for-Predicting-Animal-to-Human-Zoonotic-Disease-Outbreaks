@@ -1,0 +1,819 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid py-5 mt-3">
+    <!-- Page Header -->
+    <div class="row mb-4" data-aos="fade-up">
+        <div class="col-12">
+            <div class="glass-card p-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h2 class="gradient-text fw-bold mb-1">
+                            <i class="fas fa-history me-2"></i>Prediction History
+                        </h2>
+                        <p class="text-light mb-0">View and analyze all your past predictions</p>
+                    </div>
+                    <div>
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-light me-2">
+                            <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                        </a>
+                        <button class="btn gradient-btn" onclick="exportHistory()">
+                            <i class="fas fa-file-export me-2"></i>Export CSV
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters and Controls -->
+    <div class="row mb-4" data-aos="fade-up" data-aos-delay="100">
+        <div class="col-12">
+            <div class="glass-card p-4">
+                <div class="row g-3">
+                    <!-- Search -->
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <span class="input-group-text bg-dark border-light text-light">
+                                <i class="fas fa-search"></i>
+                            </span>
+                            <input type="text" class="form-control bg-dark text-light border-light" id="searchInput"
+                                placeholder="Search predictions...">
+                        </div>
+                    </div>
+
+                    <!-- Filter by Client -->
+                    <div class="col-md-3">
+                        <select class="form-select bg-dark text-light border-light" id="clientFilter">
+                            <option value="all">All Clients</option>
+                            <option value="Farm">Farm</option>
+                            <option value="Hospital">Hospital</option>
+                            <option value="Wildlife">Wildlife</option>
+                            <option value="global">Global</option>
+                        </select>
+                    </div>
+
+                    <!-- Filter by Risk Level -->
+                    <div class="col-md-3">
+                        <select class="form-select bg-dark text-light border-light" id="riskFilter">
+                            <option value="all">All Risk Levels</option>
+                            <option value="0">Low Risk</option>
+                            <option value="1">Medium Risk</option>
+                            <option value="2">High Risk</option>
+                        </select>
+                    </div>
+
+                    <!-- Sort Options -->
+                    <div class="col-md-2">
+                        <select class="form-select bg-dark text-light border-light" id="sortFilter">
+                            <option value="newest">Newest First</option>
+                            <option value="oldest">Oldest First</option>
+                            <option value="confidence_high">High Confidence</option>
+                            <option value="confidence_low">Low Confidence</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Date Range Filter -->
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-text bg-dark border-light text-light">
+                                <i class="fas fa-calendar-alt"></i> From
+                            </span>
+                            <input type="date" class="form-control bg-dark text-light border-light" id="dateFrom">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-text bg-dark border-light text-light">
+                                <i class="fas fa-calendar-alt"></i> To
+                            </span>
+                            <input type="date" class="form-control bg-dark text-light border-light" id="dateTo">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filter Buttons -->
+                <div class="d-flex justify-content-between mt-3">
+                    <div>
+                        <button class="btn btn-outline-light btn-sm" onclick="clearFilters()">
+                            <i class="fas fa-eraser me-2"></i>Clear Filters
+                        </button>
+                    </div>
+                    <div>
+                        <button class="btn btn-outline-info btn-sm me-2" onclick="applyFilters()">
+                            <i class="fas fa-filter me-2"></i>Apply Filters
+                        </button>
+                        <button class="btn gradient-btn btn-sm" onclick="refreshHistory()">
+                            <i class="fas fa-sync-alt me-2"></i>Refresh
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Summary -->
+    <div class="row mb-4" data-aos="fade-up" data-aos-delay="150">
+        <div class="col-md-3">
+            <div class="glass-card p-3 text-center h-100">
+                <h3 class="gradient-text fw-bold mb-2" id="totalPredictions">{{ predictions|length }}</h3>
+                <p class="text-light mb-0">Total Predictions</p>
+            </div>
+        </div>
+        <!-- <div class="col-md-3">
+            <div class="glass-card p-3 text-center h-100">
+                <h3 class="gradient-text fw-bold mb-2" id="todayPredictionsStat">0</h3>
+                <p class="text-light mb-0">Today's Predictions</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="glass-card p-3 text-center h-100">
+                <h3 class="gradient-text fw-bold mb-2" id="highRiskCount">0</h3>
+                <p class="text-light mb-0">High Risk Predictions</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="glass-card p-3 text-center h-100">
+                <h3 class="gradient-text fw-bold mb-2" id="avgConfidence">0%</h3>
+                <p class="text-light mb-0">Average Confidence</p>
+            </div>
+        </div> -->
+    </div>
+
+    <!-- Predictions Table -->
+    <div class="row" data-aos="fade-up" data-aos-delay="200">
+        <div class="col-12">
+            <div class="glass-card p-4">
+                <!-- Table Header -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4 class="fw-bold text-light mb-0">
+                        <i class="fas fa-table me-2 gradient-text"></i>All Predictions
+                    </h4>
+                    <div>
+                        <span class="text-light me-3">
+                            Showing <span id="showingCount">{{ [predictions|length, 10]|min }}</span> of <span
+                                id="totalCount">{{ predictions|length }}</span> predictions
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Scrollable Table Container -->
+                <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+                    <table class="table table-dark table-hover align-middle mb-0" id="predictionsTable">
+                        <thead style="position: sticky; top: 0; z-index: 1; background-color: #1a1a2e;">
+                            <tr>
+                                <th scope="col">ID</th>
+                                <th scope="col">Date & Time</th>
+                                <th scope="col">Client Type</th>
+                                <th scope="col">Prediction Type</th>
+                                <th scope="col">Risk Level</th>
+                                <th scope="col">Confidence</th>
+
+                            </tr>
+                        </thead>
+                        <tbody id="predictionsBody">
+                            {% for pred in predictions %}
+                            <tr data-prediction-id="{{ pred[0] }}" data-client="{{ pred[2] }}" data-risk="{{ pred[4] }}"
+                                data-date="{{ pred[9] }}" data-confidence="{{ pred[5] }}">
+                                <td class="text-light">{{ pred[0] }}</td>
+                                <td class="text-light">{{ pred[9] }}</td>
+                                <td>
+                                    <span class="badge 
+                                        {% if pred[2] == 'Farm' %}client-farm
+                                        {% elif pred[2] == 'Hospital' %}client-hospital
+                                        {% elif pred[2] == 'Wildlife' %}client-wildlife
+                                        {% else %}client-global{% endif %}">
+                                        <i class="fas 
+                                            {% if pred[2] == 'Farm' %}fa-tractor
+                                            {% elif pred[2] == 'Hospital' %}fa-hospital
+                                            {% elif pred[2] == 'Wildlife' %}fa-paw
+                                            {% else %}fa-globe{% endif %} me-1"></i>
+                                        {{ pred[2] }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge prediction-type 
+                                        {% if pred[3] == 'local' %}bg-info
+                                        {% else %}bg-warning{% endif %}">
+                                        {{ pred[3]|title }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge 
+                                        {% if pred[4] == 0 %}risk-low
+                                        {% elif pred[4] == 1 %}risk-medium
+                                        {% else %}risk-high{% endif %} py-2 px-3">
+                                        {{ ['Low Risk', 'Medium Risk', 'High Risk'][pred[4]] }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <span class="confidence-value 
+                                            {% if pred[5] > 80 %}text-success
+                                            {% elif pred[5] > 60 %}text-warning
+                                            {% else %}text-danger{% endif %}">
+                                            {{ "%.1f"|format(pred[5]) }}%
+                                        </span>
+                                    </div>
+                                </td>
+
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="7" class="text-center py-5">
+                                    <i class="fas fa-inbox fa-3x text-light opacity-50 mb-3"></i>
+                                    <h5 class="text-light">No predictions found</h5>
+                                    <p class="text-light opacity-75">Make your first prediction on the dashboard!</p>
+                                    <a href="{{ url_for('dashboard') }}" class="btn gradient-btn mt-2">
+                                        <i class="fas fa-bolt me-2"></i>Go to Dashboard
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination Controls (Optional - Alternative to scrollbar) -->
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                    <div class="text-light">
+                        <span id="pageInfo">Page 1 of <span id="totalPages">1</span></span>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Risk Distribution Chart -->
+    <div class="row mt-4" data-aos="fade-up" data-aos-delay="250">
+        <div class="col-md-6">
+            <div class="glass-card p-4 h-100">
+                <h5 class="fw-bold text-light mb-4">
+                    <i class="fas fa-chart-pie me-2 gradient-text"></i>Risk Level Distribution
+                </h5>
+                <div class="text-center">
+                    <canvas id="riskDistributionChart" height="250"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="glass-card p-4 h-100">
+                <h5 class="fw-bold text-light mb-4">
+                    <i class="fas fa-chart-bar me-2 gradient-text"></i>Predictions by Client
+                </h5>
+                <div class="text-center">
+                    <canvas id="clientDistributionChart" height="250"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Pagination variables
+    let currentPage = 1;
+    const rowsPerPage = 10;
+    let allRows = [];
+    let filteredRows = [];
+
+    // Initialize on page load
+    $(document).ready(function () {
+        initializePage();
+        applyFilters();
+    });
+
+    // Initialize page
+    function initializePage() {
+        allRows = Array.from(document.querySelectorAll('#predictionsBody tr[data-prediction-id]'));
+        filteredRows = [...allRows];
+
+        // Calculate stats
+        calculateTodayPredictions();
+        calculateRiskStats();
+        calculateAvgConfidence();
+
+        // Initialize charts
+        initializeCharts();
+
+        // Setup pagination
+        setupPagination();
+    }
+
+    // Setup pagination
+    function setupPagination() {
+        const totalRows = filteredRows.length;
+        const totalPages = Math.ceil(totalRows / rowsPerPage);
+
+        $('#totalPages').text(totalPages);
+        $('#totalCount').text(totalRows);
+
+        // Show first page
+        showPage(1);
+    }
+
+    // Show specific page
+    function showPage(page) {
+        currentPage = page;
+        const start = (page - 1) * rowsPerPage;
+        const end = start + rowsPerPage;
+
+        // Hide all rows
+        allRows.forEach(row => row.style.display = 'none');
+
+        // Show only rows for current page
+        filteredRows.slice(start, end).forEach(row => {
+            row.style.display = '';
+        });
+
+        // Update pagination controls
+        updatePaginationControls();
+
+        // Update showing count
+        const showingCount = Math.min(end, filteredRows.length) - start;
+        $('#showingCount').text(showingCount);
+    }
+
+    // Update pagination controls
+    function updatePaginationControls() {
+        const totalPages = Math.ceil(filteredRows.length / rowsPerPage);
+
+        $('#pageInfo').text(`Page ${currentPage} of ${totalPages}`);
+
+        // Previous button
+        $('#prevBtn').prop('disabled', currentPage === 1);
+
+        // Next button
+        $('#nextBtn').prop('disabled', currentPage === totalPages || totalPages === 0);
+    }
+
+    // Next page
+    function nextPage() {
+        const totalPages = Math.ceil(filteredRows.length / rowsPerPage);
+        if (currentPage < totalPages) {
+            showPage(currentPage + 1);
+
+            // Scroll to top of table
+            document.querySelector('.table-responsive').scrollTop = 0;
+        }
+    }
+
+    // Previous page
+    function previousPage() {
+        if (currentPage > 1) {
+            showPage(currentPage - 1);
+
+            // Scroll to top of table
+            document.querySelector('.table-responsive').scrollTop = 0;
+        }
+    }
+
+    // Calculate today's predictions
+    function calculateTodayPredictions() {
+        const today = new Date().toISOString().split('T')[0];
+        let todayCount = 0;
+
+        allRows.forEach(row => {
+            const predDate = new Date(row.dataset.date).toISOString().split('T')[0];
+            if (predDate === today) {
+                todayCount++;
+            }
+        });
+
+        $('#todayPredictionsStat').text(todayCount);
+    }
+
+    // Calculate risk statistics
+    function calculateRiskStats() {
+        let highRiskCount = 0;
+
+        allRows.forEach(row => {
+            const riskLevel = parseInt(row.dataset.risk);
+            if (riskLevel === 2) { // High risk
+                highRiskCount++;
+            }
+        });
+
+        $('#highRiskCount').text(highRiskCount);
+    }
+
+    // Calculate average confidence
+    function calculateAvgConfidence() {
+        if (allRows.length === 0) {
+            $('#avgConfidence').text('0%');
+            return;
+        }
+
+        let totalConfidence = 0;
+        allRows.forEach(row => {
+            totalConfidence += parseFloat(row.dataset.confidence);
+        });
+
+        const avgConfidence = totalConfidence / allRows.length;
+        $('#avgConfidence').text(`${avgConfidence.toFixed(1)}%`);
+    }
+
+    // Initialize charts
+    function initializeCharts() {
+        // ... (keep the existing initializeCharts function code) ...
+        // This remains the same as in your original code
+        const predictions = Array.from(document.querySelectorAll('#predictionsBody tr[data-prediction-id]'));
+
+        // Risk Distribution Chart
+        const riskCounts = [0, 0, 0];
+        const riskLabels = ['Low Risk', 'Medium Risk', 'High Risk'];
+
+        predictions.forEach(row => {
+            const riskLevel = parseInt(row.dataset.risk);
+            riskCounts[riskLevel]++;
+        });
+
+        // Remove empty categories
+        const filteredRiskLabels = [];
+        const filteredRiskCounts = [];
+        riskCounts.forEach((count, index) => {
+            if (count > 0) {
+                filteredRiskLabels.push(riskLabels[index]);
+                filteredRiskCounts.push(count);
+            }
+        });
+
+        if (filteredRiskCounts.length > 0) {
+            const riskCtx = document.getElementById('riskDistributionChart').getContext('2d');
+            new Chart(riskCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: filteredRiskLabels,
+                    datasets: [{
+                        data: filteredRiskCounts,
+                        backgroundColor: [
+                            'rgba(40, 167, 69, 0.8)',
+                            'rgba(255, 193, 7, 0.8)',
+                            'rgba(220, 53, 69, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgba(40, 167, 69, 1)',
+                            'rgba(255, 193, 7, 1)',
+                            'rgba(220, 53, 69, 1)'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#ffffff',
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    const label = context.label || '';
+                                    const value = context.raw || 0;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = Math.round((value / total) * 100);
+                                    return `${label}: ${value} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        } else {
+            document.getElementById('riskDistributionChart').parentElement.innerHTML = `
+                <div class="text-center py-5">
+                    <i class="fas fa-chart-pie fa-3x text-light opacity-50 mb-3"></i>
+                    <p class="text-light">No prediction data available for chart</p>
+                </div>
+            `;
+        }
+
+        // Client Distribution Chart
+        const clientCounts = {
+            'Farm': 0,
+            'Hospital': 0,
+            'Wildlife': 0,
+            'Global': 0
+        };
+
+        predictions.forEach(row => {
+            const client = row.dataset.client;
+            if (clientCounts.hasOwnProperty(client)) {
+                clientCounts[client]++;
+            }
+        });
+
+        // Filter out clients with zero predictions
+        const clientLabels = [];
+        const clientData = [];
+        Object.entries(clientCounts).forEach(([client, count]) => {
+            if (count > 0) {
+                clientLabels.push(client);
+                clientData.push(count);
+            }
+        });
+
+        if (clientData.length > 0) {
+            const clientCtx = document.getElementById('clientDistributionChart').getContext('2d');
+            new Chart(clientCtx, {
+                type: 'bar',
+                data: {
+                    labels: clientLabels,
+                    datasets: [{
+                        label: 'Number of Predictions',
+                        data: clientData,
+                        backgroundColor: [
+                            'rgba(39, 174, 96, 0.8)',
+                            'rgba(52, 152, 219, 0.8)',
+                            'rgba(230, 126, 34, 0.8)',
+                            'rgba(155, 89, 182, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgba(39, 174, 96, 1)',
+                            'rgba(52, 152, 219, 1)',
+                            'rgba(230, 126, 34, 1)',
+                            'rgba(155, 89, 182, 1)'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#ffffff'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#ffffff',
+                                stepSize: 1
+                            }
+                        }
+                    }
+                }
+            });
+        } else {
+            document.getElementById('clientDistributionChart').parentElement.innerHTML = `
+                <div class="text-center py-5">
+                    <i class="fas fa-chart-bar fa-3x text-light opacity-50 mb-3"></i>
+                    <p class="text-light">No client data available for chart</p>
+                </div>
+            `;
+        }
+    }
+
+    // Apply filters
+    function applyFilters() {
+        const searchTerm = $('#searchInput').val().toLowerCase();
+        const clientFilter = $('#clientFilter').val();
+        const riskFilter = $('#riskFilter').val();
+        const dateFrom = $('#dateFrom').val();
+        const dateTo = $('#dateTo').val();
+        const sortFilter = $('#sortFilter').val();
+
+        filteredRows = [];
+
+        allRows.forEach(row => {
+            let includeRow = true;
+
+            // Search filter
+            if (searchTerm) {
+                const rowText = row.textContent.toLowerCase();
+                if (!rowText.includes(searchTerm)) {
+                    includeRow = false;
+                }
+            }
+
+            // Client filter
+            if (clientFilter !== 'all' && row.dataset.client !== clientFilter) {
+                includeRow = false;
+            }
+
+            // Risk filter
+            if (riskFilter !== 'all' && row.dataset.risk !== riskFilter) {
+                includeRow = false;
+            }
+
+            // Date filter
+            if (dateFrom) {
+                const rowDate = new Date(row.dataset.date).toISOString().split('T')[0];
+                if (rowDate < dateFrom) {
+                    includeRow = false;
+                }
+            }
+
+            if (dateTo) {
+                const rowDate = new Date(row.dataset.date).toISOString().split('T')[0];
+                if (rowDate > dateTo) {
+                    includeRow = false;
+                }
+            }
+
+            if (includeRow) {
+                filteredRows.push(row);
+            }
+        });
+
+        // Sort rows
+        sortTableRows(sortFilter);
+
+        // Reset to first page
+        setupPagination();
+
+        // Update charts with filtered data
+        initializeCharts();
+    }
+
+    // Sort table rows
+    function sortTableRows(sortType) {
+        filteredRows.sort((a, b) => {
+            switch (sortType) {
+                case 'newest':
+                    return new Date(b.dataset.date) - new Date(a.dataset.date);
+                case 'oldest':
+                    return new Date(a.dataset.date) - new Date(b.dataset.date);
+                case 'confidence_high':
+                    return parseFloat(b.dataset.confidence) - parseFloat(a.dataset.confidence);
+                case 'confidence_low':
+                    return parseFloat(a.dataset.confidence) - parseFloat(b.dataset.confidence);
+                default:
+                    return 0;
+            }
+        });
+    }
+
+    // Clear all filters
+    function clearFilters() {
+        $('#searchInput').val('');
+        $('#clientFilter').val('all');
+        $('#riskFilter').val('all');
+        $('#dateFrom').val('');
+        $('#dateTo').val('');
+        $('#sortFilter').val('newest');
+        applyFilters();
+    }
+
+    // Refresh history
+    function refreshHistory() {
+        window.location.reload();
+    }
+
+    // Export history to CSV
+    function exportHistory() {
+        let csv = 'ID,Date,Client Type,Prediction Type,Risk Level,Confidence\n';
+
+        filteredRows.forEach(row => {
+            const cells = row.querySelectorAll('td');
+            const id = cells[0].textContent;
+            const date = cells[1].textContent;
+            const client = cells[2].querySelector('.badge').textContent.trim();
+            const predType = cells[3].querySelector('.badge').textContent.trim();
+            const risk = cells[4].querySelector('.badge').textContent.trim();
+            const confidence = cells[5].querySelector('.confidence-value').textContent.trim();
+
+            csv += `"${id}","${date}","${client}","${predType}","${risk}","${confidence}"\n`;
+        });
+
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `predictions_history_${new Date().toISOString().split('T')[0]}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+
+        showToast('History exported successfully', 'success');
+    }
+
+    // View prediction details (placeholder function)
+    function viewPredictionDetails(predictionId) {
+        showToast(`Viewing details for prediction ${predictionId}`, 'info');
+        // Implement your detail view logic here
+    }
+
+    // Show toast notification
+    function showToast(message, type = 'info') {
+        const toastHtml = `
+        <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+            <div class="toast show" role="alert">
+                <div class="toast-header bg-${type} text-white">
+                    <strong class="me-auto">Notification</strong>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+                </div>
+                <div class="toast-body bg-dark text-light">
+                    ${message}
+                </div>
+            </div>
+        </div>
+        `;
+
+        // Remove existing toasts
+        document.querySelectorAll('.position-fixed.bottom-0.end-0').forEach(el => el.remove());
+
+        // Add new toast
+        document.body.insertAdjacentHTML('beforeend', toastHtml);
+
+        // Auto remove after 3 seconds
+        setTimeout(() => {
+            document.querySelectorAll('.position-fixed.bottom-0.end-0').forEach(el => el.remove());
+        }, 3000);
+    }
+
+    // Add CSS for scrollbar styling
+    const style = document.createElement('style');
+    style.textContent = `
+    /* Custom scrollbar for table */
+    .table-responsive::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+    
+    .table-responsive::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+    }
+    
+    .table-responsive::-webkit-scrollbar-thumb {
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        border-radius: 4px;
+    }
+    
+    .table-responsive::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(45deg, #764ba2, #667eea);
+    }
+    
+    /* Table styling */
+    .client-farm {
+        background: linear-gradient(45deg, #27ae60, #2ecc71);
+    }
+    .client-hospital {
+        background: linear-gradient(45deg, #3498db, #2980b9);
+    }
+    .client-wildlife {
+        background: linear-gradient(45deg, #e67e22, #d35400);
+    }
+    .client-global {
+        background: linear-gradient(45deg, #9b59b6, #8e44ad);
+    }
+    .risk-low {
+        background: linear-gradient(45deg, #28a745, #20c997);
+        color: white;
+        font-weight: 600;
+    }
+    .risk-medium {
+        background: linear-gradient(45deg, #ffc107, #fd7e14);
+        color: white;
+        font-weight: 600;
+    }
+    .risk-high {
+        background: linear-gradient(45deg, #dc3545, #fd7e14);
+        color: white;
+        font-weight: 600;
+    }
+    .prediction-type {
+        font-size: 0.8em;
+        padding: 4px 10px;
+    }
+    .confidence-value {
+        font-size: 1.1em;
+        font-weight: 600;
+        min-width: 70px;
+        display: inline-block;
+    }
+    .table-hover tbody tr:hover {
+        background: rgba(255, 255, 255, 0.05) !important;
+        transform: translateY(-2px);
+        transition: all 0.3s ease;
+    }
+    `;
+    document.head.appendChild(style);
+</script>
+{% endblock %}
+{% endblock %}

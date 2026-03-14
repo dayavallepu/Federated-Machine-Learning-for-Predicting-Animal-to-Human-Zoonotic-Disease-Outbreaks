@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container min-vh-100 d-flex align-items-center justify-content-center">
+    <div class="text-center" data-aos="zoom-in">
+        <div class="display-1 gradient-text fw-bold">404</div>
+        <h2 class="fw-bold text-light mb-3">Page Not Found</h2>
+        <p class="text-light mb-4">The page you're looking for doesn't exist or has been moved.</p>
+        <a href="{{ url_for('home') }}" class="btn gradient-btn">
+            <i class="fas fa-home me-2"></i>Back to Home
+        </a>
+    </div>
+</div>
+{% endblock %}
