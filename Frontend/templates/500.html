@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container min-vh-100 d-flex align-items-center justify-content-center">
+    <div class="text-center" data-aos="zoom-in">
+        <div class="display-1 gradient-text fw-bold">500</div>
+        <h2 class="fw-bold text-light mb-3">Internal Server Error</h2>
+        <p class="text-light mb-4">Something went wrong on our end. Please try again later.</p>
+        <div class="d-flex gap-3 justify-content-center">
+            <a href="{{ url_for('home') }}" class="btn gradient-btn">
+                <i class="fas fa-home me-2"></i>Back to Home
+            </a>
+            <a href="{{ url_for('dashboard') }}" class="btn btn-outline-light">
+                <i class="fas fa-dashboard me-2"></i>Go to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

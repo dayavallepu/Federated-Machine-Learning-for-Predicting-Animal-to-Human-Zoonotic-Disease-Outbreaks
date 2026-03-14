@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5 mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="glass-card p-5" data-aos="zoom-in">
+                <div class="text-center mb-4">
+                    <h2 class="gradient-text fw-bold">Create Account</h2>
+                    <p class="text-light">Join our AI-powered disease prediction platform</p>
+                </div>
+                
+                <form method="POST" action="{{ url_for('register') }}">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-light">Full Name</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-dark border-dark">
+                                    <i class="fas fa-id-card text-light"></i>
+                                </span>
+                                <input type="text" class="form-control feature-input" 
+                                       name="full_name" placeholder="John Doe">
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-light">Username *</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-dark border-dark">
+                                    <i class="fas fa-user text-light"></i>
+                                </span>
+                                <input type="text" class="form-control feature-input" 
+                                       name="username" required 
+                                       placeholder="johndoe">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label text-light">Email Address *</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-dark border-dark">
+                                <i class="fas fa-envelope text-light"></i>
+                            </span>
+                            <input type="email" class="form-control feature-input" 
+                                   name="email" required 
+                                   placeholder="john@example.com">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-light">Password *</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-dark border-dark">
+                                    <i class="fas fa-lock text-light"></i>
+                                </span>
+                                <input type="password" class="form-control feature-input" 
+                                       name="password" required 
+                                       placeholder="••••••••">
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-4">
+                            <label class="form-label text-light">Confirm Password *</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-dark border-dark">
+                                    <i class="fas fa-lock text-light"></i>
+                                </span>
+                                <input type="password" class="form-control feature-input" 
+                                       required placeholder="••••••••">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4 form-check">
+                        <input type="checkbox" class="form-check-input" id="terms" required>
+                        <label class="form-check-label text-light" for="terms">
+                            I agree to the <a href="#" class="gradient-text">Terms of Service</a> 
+                            and <a href="#" class="gradient-text">Privacy Policy</a>
+                        </label>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn gradient-btn">
+                            <i class="fas fa-user-plus me-2"></i>Create Account
+                        </button>
+                    </div>
+                    
+                    <div class="text-center mt-4">
+                        <p class="text-light">Already have an account? 
+                            <a href="{{ url_for('login') }}" class="gradient-text text-decoration-none">
+                                Sign in here
+                            </a>
+                        </p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
