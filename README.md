@@ -1,0 +1,2 @@
+# Federated-Machine-Learning-for-Predicting-Animal-to-Human-Zoonotic-Disease-Outbreaks
+This project implements a hybrid federated deep neural network (FDNN) combined with XGBoost to predict zoonotic disease outbreaks across distributed datasets (Farm, Hospital, Wildlife) without sharing raw data. Includes EDA, preprocessing, model training, and a Flask-based web dashboard for visualization and predictions.
